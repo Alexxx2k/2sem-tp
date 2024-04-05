@@ -6,13 +6,11 @@
 #include <vector>
 #include <iomanip>
 
-namespace nspace
+namespace nikiforov
 {
-  // формат ввода:
-  // { "key1": 1.0d, "key2": "Let madness release you" }
   struct Data
   {
-    double key1;
+    unsigned long long key1;
     char key2;
     std::string key3;
   };
@@ -22,9 +20,9 @@ namespace nspace
     char exp;
   };
 
-  struct DoubleIO
+  struct UnsignedLongLongIO
   {
-    double& ref;
+    unsigned long long& ref;
   };
 
   struct CharIO
@@ -56,7 +54,7 @@ namespace nspace
   };
 
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest);
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest);
+  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest);
   std::istream& operator>>(std::istream& in, CharIO&& dest);
   std::istream& operator>>(std::istream& in, StringIO&& dest);
   std::istream& operator>>(std::istream& in, LabelIO&& dest);
@@ -66,10 +64,10 @@ namespace nspace
 
 int main()
 {
-  using nspace::Data;
+  using nikiforov::Data;
 
   std::vector< Data > data;
-  std::istringstream iss("(:key1 00:key2 'a':key3 \"Let madness release you\":)");
+  std::istringstream iss("(:key1 00:key2 'a':key3 \"Data\":)");
 
   std::copy(
     std::istream_iterator< Data >(iss),
@@ -77,7 +75,6 @@ int main()
     std::back_inserter(data)
   );
 
-  std::cout << "Data:\n";
   std::copy(
     std::begin(data),
     std::end(data),
@@ -87,7 +84,7 @@ int main()
   return 0;
 }
 
-namespace nspace
+namespace nikiforov
 {
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
@@ -106,7 +103,7 @@ namespace nspace
     return in;
   }
 
-  std::istream& operator>>(std::istream& in, DoubleIO&& dest)
+  std::istream& operator>>(std::istream& in, UnsignedLongLongIO&& dest)
   {
     std::istream::sentry sentry(in);
     if (!sentry)
@@ -162,7 +159,7 @@ namespace nspace
     {
       using sep = DelimiterIO;
       using label = LabelIO;
-      using dbl = DoubleIO;
+      using ull = UnsignedLongLongIO;
       using chr = CharIO;
       using str = StringIO;
       std::string key = "";
@@ -174,7 +171,7 @@ namespace nspace
         in >> sep{ ':' } >> key;
         if (key == "key1")
         {
-          in >> dbl{ input.key1 };
+          in >> sep{ '0' } >> ull{ input.key1 };
         }
         else if (key == "key2")
         {
@@ -189,14 +186,7 @@ namespace nspace
           in.setstate(std::ios::failbit);
         }
       }
-
       in >> sep{ ':' } >> sep{ ')' };
-      /*
-      in >> sep{ '(' };
-      in >> label{ "key1" } >> sep{ ':' } >> dbl{ input.key1 };
-      in >> sep{ ',' };
-      in >> label{ "key2" } >> sep{ ':' } >> str{ input.key2 };
-      in >> sep{ ')' };*/
     }
     if (in)
     {
@@ -214,7 +204,7 @@ namespace nspace
     }
     iofmtguard fmtguard(out);
     out << "(:";
-    out << "key1 " << std::fixed << std::setprecision(1) << src.key1 << "d" << ":";
+    out << "key1 " << "0" << src.key1 << ":";
     out << "key2 " << "'" << src.key2 << "'" << ":";
     out << "key3 " << src.key3 << ":";
     out << ")";
