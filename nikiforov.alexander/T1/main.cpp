@@ -40,7 +40,6 @@ namespace nikiforov
     std::string exp;
   };
 
-  // scope guard дл€ возврата состо€ни€ потока в первоначальное состо€ние
   class iofmtguard
   {
   public:
@@ -88,7 +87,6 @@ namespace nikiforov
 {
   std::istream& operator>>(std::istream& in, DelimiterIO&& dest)
   {
-    // все перегрузки операторов ввода/вывода должны начинатьс€ с проверки экземпл€ра класса sentry
     std::istream::sentry sentry(in);
     if (!sentry)
     {
